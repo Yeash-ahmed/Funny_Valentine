@@ -53,46 +53,45 @@ if not st.session_state.accepted:
 
         st.markdown("<br>" * 3, unsafe_allow_html=True)
 
-        yes = st.button("YES! Obviously! 💘", type="primary", use_container_width=True,
-                        key="yes_btn")
+        yes = st.button(
+            "YES! Obviously! 💘",
+            type="primary",
+            use_container_width=True,
+            key="yes_btn"
+        )
 
-        # Very tricky NO button
-        placeholder = st.empty()
-
-        # We create a fake moving button using columns + random position
-        if not st.session_state.no_button_disabled:
-
-            # Random column position trick
-            cols = st.columns(5)
-            positions = [0, 1, 2, 3, 4]
-            bad_pos = random.choice(positions)
-
-            with cols[bad_pos]:
-                if st.button("No 😿", key=f"no_{random.randint(1, 999999)}"):
-                    # This should almost never happen
-                    st.session_state.no_button_disabled = True
-                    st.rerun()
-
-        # ─── When YES is clicked ────────────────────────────────
+        # ─── IF YES IS CLICKED ───
         if yes:
             st.session_state.accepted = True
+            st.session_state.no_button_disabled = True  # 🔥 hide NO immediately
             st.balloons()
             st.snow()
-            time.sleep(0.6)
+            time.sleep(0.4)
             st.rerun()
+
+        # ─── NO BUTTON (only when YES not clicked) ───
+        if not st.session_state.no_button_disabled:
+
+            cols = st.columns(5)
+            bad_pos = random.randint(0, 4)
+
+            with cols[bad_pos]:
+                st.button(
+                    "No 😿",
+                    key=f"no_{random.randint(1, 999999)}"
+                )
 
 else:
     # ─── SUCCESS SCREEN ───────────────────────────────────────
-    st.empty()  # clear previous content
+    st.empty()
 
-    # Cute animation + message
     html(cute_html, height=600)
 
     st.markdown("<br><br>", unsafe_allow_html=True)
 
     if st.button("I want to say YES again 💕", type="primary"):
         st.session_state.accepted = False
+        st.session_state.no_button_disabled = False
         st.rerun()
 
     st.caption("Made with love & a little bit of evil genius 😈")
-
