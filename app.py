@@ -24,11 +24,7 @@ cute_html = """
         ❤️❤️❤️❤️❤️
     </div>
 
-    <p style="font-size: 1.5rem; color: #ff4785;">
-        I promise to send you memes at 2 AM,<br>
-        steal your fries, and love you forever 💕
-    </p>
-
+  
     <div style="margin-top: 40px; font-size: 2.8rem;">
         🥰 💗 🌸 🍓 ✨ 💘 🫶
     </div>
@@ -99,3 +95,4 @@ else:
         st.rerun()
 
     st.caption("Made with love & a little bit of evil genius 😈")
+
