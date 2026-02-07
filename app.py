@@ -1,126 +1,101 @@
+# Valentine_Proposal.py
 import streamlit as st
+import random
+import time
+from streamlit.components.v1 import html
 
-st.set_page_config(page_title="Valentine 💘", layout="centered")
+st.set_page_config(page_title="Be My Valentine? 💘", page_icon="❤️", layout="centered")
 
-# ---------------- STATE ----------------
-if "accepted" not in st.session_state:
+# ---- Session state ----
+if 'accepted' not in st.session_state:
     st.session_state.accepted = False
+if 'no_button_disabled' not in st.session_state:
+    st.session_state.no_button_disabled = False
 
-# ---------------- CSS + JS ----------------
-st.markdown("""
-<style>
-body {
-    background: linear-gradient(135deg, #0f0f14, #1a1a24);
-}
-
-.title {
-    text-align: center;
-    font-size: 30px;
-    font-weight: 700;
-    color: #ff4d6d;
-    margin-top: 20px;
-}
-
-.heart {
-    text-align: center;
-    font-size: 60px;
-    margin-top: 10px;
-}
-
-.buttons {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    margin-top: 50px;
-}
-
-button {
-    padding: 16px 30px;
-    font-size: 18px;
-    border-radius: 16px;
-    border: none;
-}
-
-#yes-btn {
-    background: #ff4d6d;
-    color: white;
-}
-
-#no-btn {
-    background: #495057;
-    color: white;
-    position: fixed;
-}
-</style>
-
-<script>
-function moveButton() {
-    const btn = document.getElementById("no-btn");
-    const maxX = window.innerWidth - btn.offsetWidth - 20;
-    const maxY = window.innerHeight - btn.offsetHeight - 20;
-
-    const x = Math.random() * maxX;
-    const y = Math.random() * maxY;
-
-    btn.style.left = x + "px";
-    btn.style.top = y + "px";
-}
-
-function playMusic() {
-    const audio = document.getElementById("bg-music");
-    if (audio) audio.play();
-}
-</script>
-""", unsafe_allow_html=True)
-
-# ---------------- MUSIC ----------------
-st.markdown("""
-<audio id="bg-music" loop>
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-</audio>
-""", unsafe_allow_html=True)
-
-# ---------------- MAIN SCREEN ----------------
-if not st.session_state.accepted:
-    st.markdown("<div class='heart'>💘</div>", unsafe_allow_html=True)
-    st.markdown("<div class='title'>Will you be my Valentine? 🥺💖</div>", unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class="buttons">
-        <a href="?yes=true">
-            <button id="yes-btn" onclick="playMusic()">YES 💕</button>
-        </a>
-
-        <button id="no-btn"
-            ontouchstart="moveButton()"
-            onpointerdown="moveButton()"
-            onclick="moveButton()">
-            NO 😝
-        </button>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # ✅ NEW API (NO WARNING)
-    if st.query_params.get("yes") == "true":
-        st.session_state.accepted = True
-        st.query_params.clear()
-
-# ---------------- AFTER YES ----------------
-else:
-    st.balloons()
-    st.markdown("<div class='heart'>💞💞💞</div>", unsafe_allow_html=True)
-    st.markdown("<div class='title'>YAYYYY 💖🥰</div>", unsafe_allow_html=True)
-
-    st.markdown("""
-    <p style="text-align:center; font-size:18px; color:#ffc2d1;">
-    You are officially my Valentine 😌🌹<br><br>
-    🍫 Chocolates × Infinity<br>
-    🤗 Hugs × Lifetime<br>
-    😂 Memes × Daily
+# Heart explosion & cute animation (very simple JS + emoji version)
+cute_html = """
+<div style="text-align:center; padding: 40px 0;">
+    <h1 style="font-size: 3.8rem; color: #ff3366; margin:0;">YESSSSS!!! 🥰💖</h1>
+    <p style="font-size: 1.6rem; color: #ff6699; margin: 20px 0;">
+        You just made me the happiest person in the world! ✨
     </p>
-    """, unsafe_allow_html=True)
 
-    st.image(
-        "https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif",
-        use_container_width=True
-    )
+    <div style="font-size: 4rem; margin: 30px 0; animation: heartBeat 1.2s infinite;">
+        ❤️❤️❤️❤️❤️
+    </div>
+
+    <p style="font-size: 1.5rem; color: #ff4785;">
+        I promise to send you memes at 2 AM,<br>
+        steal your fries, and love you forever 💕
+    </p>
+
+    <div style="margin-top: 40px; font-size: 2.8rem;">
+        🥰 💗 🌸 🍓 ✨ 💘 🫶
+    </div>
+</div>
+
+<style>
+    @keyframes heartBeat {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.25); }
+        100% { transform: scale(1); }
+    }
+</style>
+"""
+
+# ───────────────────────────────────────────────
+#               MAIN PAGE
+# ───────────────────────────────────────────────
+
+if not st.session_state.accepted:
+
+    st.title("✨ Will You Be My Valentine? 💕")
+
+    col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col2:
+
+        st.markdown("<br>" * 3, unsafe_allow_html=True)
+
+        yes = st.button("YES! Obviously! 💘", type="primary", use_container_width=True,
+                        key="yes_btn")
+
+        # Very tricky NO button
+        placeholder = st.empty()
+
+        # We create a fake moving button using columns + random position
+        if not st.session_state.no_button_disabled:
+
+            # Random column position trick
+            cols = st.columns(5)
+            positions = [0, 1, 2, 3, 4]
+            bad_pos = random.choice(positions)
+
+            with cols[bad_pos]:
+                if st.button("No 😿", key=f"no_{random.randint(1, 999999)}"):
+                    # This should almost never happen
+                    st.session_state.no_button_disabled = True
+                    st.rerun()
+
+        # ─── When YES is clicked ────────────────────────────────
+        if yes:
+            st.session_state.accepted = True
+            st.balloons()
+            st.snow()
+            time.sleep(0.6)
+            st.rerun()
+
+else:
+    # ─── SUCCESS SCREEN ───────────────────────────────────────
+    st.empty()  # clear previous content
+
+    # Cute animation + message
+    html(cute_html, height=600)
+
+    st.markdown("<br><br>", unsafe_allow_html=True)
+
+    if st.button("I want to say YES again 💕", type="primary"):
+        st.session_state.accepted = False
+        st.rerun()
+
+    st.caption("Made with love & a little bit of evil genius 😈")
